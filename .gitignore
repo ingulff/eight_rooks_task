@@ -1,0 +1,9 @@
+# Dirs
+
+out
+.vs*
+build
+docs
+
+*.txt
+!*CMakeLists.txt
