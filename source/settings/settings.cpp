@@ -2,8 +2,6 @@
  *  ᛝ
  */
 
-#include <cstdint>
-
 #include "settings.hpp"
 
 namespace tt_program
