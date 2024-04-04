@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+# Dirs
+out
+.vs*
+build
+docs
+
+# Notes
+*.txt
+!*CMakeLists.txt
