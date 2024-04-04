@@ -1,6 +1,7 @@
 #ifndef TT_ROOKS_SYNCHRONIZER_HPP
 #define TT_ROOKS_SYNCHRONIZER_HPP
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 
