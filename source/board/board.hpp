@@ -53,7 +53,7 @@ private:
 	bool can_make_horizontal_move(const position_t & cur_position, const position_t & new_position);
 
 public:
-	const_data_ptr data() const;
+	board_data_t data() const;
 
 private:
 	std::array<data_t, 8> m_board;

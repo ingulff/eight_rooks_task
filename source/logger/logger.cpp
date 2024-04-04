@@ -3,6 +3,7 @@
  */
 
 #include <iostream>
+#include <string>
 #include <utility>
 
 #include <cstdint>
@@ -15,7 +16,7 @@ namespace tt_program
 inline namespace details
 {
 
-void print_board(std::ostream & out, tt_program::const_data_ptr board_data)
+void print_board(std::ostream & out, tt_program::board_data_t board_data)
 {
 	std::string_view board_aplha = "  |A |B |C |D |E |F |G |H |   \n";
 	std::string_view board_border = "-----------------------------\n";
@@ -25,7 +26,7 @@ void print_board(std::ostream & out, tt_program::const_data_ptr board_data)
 		out << (i+1) << " |";
 		for(std::uint8_t j = 0; j < 8; ++j)
 		{
-			bool is_empty = !!((*(board_data+i)) & (1 << j));
+			bool is_empty = !!(board_data[i] & (1 << j));
 			if(is_empty == false)
 			{
 				out << "  |";
