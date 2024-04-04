@@ -7,3 +7,6 @@ docs
 
 *.txt
 !*CMakeLists.txt
+
+*.log
+*.html
