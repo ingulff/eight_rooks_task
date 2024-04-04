@@ -36,10 +36,11 @@ add_executable(${EXECUTABLE_TARGET_NAME})
 set(${EXECUTABLE_TARGET_NAME}_source
 	${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
 
-	${CMAKE_CURRENT_SOURCE_DIR}/board.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/board/board.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/error/error.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/rook.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/settings.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/figures/rook.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/logger/logger.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/settings/settings.cpp
 )
 
 # other source
