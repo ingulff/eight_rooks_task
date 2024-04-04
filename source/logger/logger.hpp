@@ -1,6 +1,7 @@
 #ifndef TT_LOGGER_HPP
 #define TT_LOGGER_HPP
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <string>
