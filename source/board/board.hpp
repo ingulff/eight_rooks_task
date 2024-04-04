@@ -4,31 +4,29 @@
 #include <array>
 #include <mutex>
 
+#include <cstdint>
+
+#include "board/board_helpers.hpp"
+#include "board/position.hpp"
+#include "logger/logger.hpp"
 #include "utils/rooks_synchronizer.hpp"
 
 namespace tt_program
 {
 
-struct position_t
-{
-	std::int8_t x;
-	std::int8_t y;
-};
-
 class board_t
 {
-
 public:
-	board_t(std::int8_t rooks_count);
+	board_t(std::int8_t rooks_count, tt_program::event_logger & logger);
 
 	board_t(board_t & other) = delete;
 	board_t & operator=(board_t & other) = delete;
 
 	~board_t() = default;
 
-	bool try_make_horizontal_move(const position_t & cur_position, const position_t & new_position);
+	bool try_make_horizontal_move(const std::string & fig_name, const position_t & cur_position, const position_t & new_position);
 
-	bool try_make_vertical_move(const position_t & cur_position, const position_t & new_position);
+	bool try_make_vertical_move(const std::string & fig_name, const position_t & cur_position, const position_t & new_position);
 
 public:
 	void wait_all_rooks();
@@ -54,10 +52,15 @@ private:
 
 	bool can_make_horizontal_move(const position_t & cur_position, const position_t & new_position);
 
+public:
+	const_data_ptr data() const;
+
 private:
-	std::array<std::int8_t, 8> m_board;
+	std::array<data_t, 8> m_board;
 	std::mutex m_mutex;
 	tt_utils::rooks_synchronizer m_rooks_synchronizer;
+
+	tt_program::event_logger & m_logger;
 };
 
 } // namespace tt_program
