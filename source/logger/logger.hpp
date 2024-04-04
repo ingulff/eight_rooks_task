@@ -28,7 +28,7 @@ public:
 		std::string figure_name;
 		tt_program::position_t start;
 		tt_program::position_t end;
-		tt_program::const_data_ptr board_data;
+		tt_program::board_data_t board_data;
 		bool is_move_success;
 	};
 

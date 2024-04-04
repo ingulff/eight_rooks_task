@@ -155,7 +155,7 @@ void board_t::clear_position(const position_t & position)
 
 bool board_t::is_valid_position(const position_t & position)
 {
-	return (position.x > -1) && (position.x < 8) && (position.y > -1) && (position.y < 8);
+	return (position.x < 8) && (position.y < 8);
 }
 
 bool board_t::can_make_vertical_move(const position_t & cur_position, const position_t & new_position)
@@ -217,9 +217,9 @@ bool board_t::can_make_horizontal_move(const position_t & cur_position, const po
 }
 
 
-const_data_ptr board_t::data() const
+board_data_t board_t::data() const
 {
-	return m_board.data();
+	return m_board;
 }
 
 
