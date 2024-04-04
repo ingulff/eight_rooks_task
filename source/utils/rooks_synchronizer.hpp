@@ -1,8 +1,7 @@
 #ifndef TT_ROOKS_SYNCHRONIZER_HPP
 #define TT_ROOKS_SYNCHRONIZER_HPP
 
-#include <iostream>
-
+#include <condition_variable>
 #include <mutex>
 
 namespace tt_utils
@@ -28,7 +27,7 @@ public:
     {
         std::unique_lock lock( m_mutex );
 //std::cout << "sync::wait() - " << (int)m_active_rooks << std::endl;
-        m_rooks_starter.wait( lock, [this](){ return this->need_wait(); } );
+        m_rooks_starter.wait( lock, [this](){ return !( this->need_wait() ); } );
     }
 
     bool need_wait()
@@ -38,7 +37,12 @@ public:
 
     void notify_all()
     {
-        while ( need_wait() );
+//std::cout << "notify all (" << std::endl;
+        while ( need_wait() )
+        {
+            ;
+        }
+//std::cout << "notify all )" << std::endl;
         m_rooks_starter.notify_all( );
     }
 
