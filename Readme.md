@@ -35,8 +35,8 @@ $ cmake --build --preset ninja-clang-x64-release-linux # сборка
 
 Сборка проверена:  
 - ubuntu 22.04
-	- cmake 
-	- clang & clang++
+	- cmake version 3.29.1
+	- clang & clang++ version 15.0.7
 - Windows 11
 	- cmake 3.20.21032501
 	- Visual Studo 16 2019
