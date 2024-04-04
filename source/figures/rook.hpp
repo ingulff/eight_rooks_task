@@ -3,10 +3,11 @@
 
 #include <chrono>
 #include <random>
+#include <string>
 
 #include <cstdint>
 
-#include "board.hpp"
+#include "board/board.hpp"
 
 namespace tt_program
 {
@@ -55,6 +56,7 @@ private:
 	const std::int32_t m_wait_move_timeout;
 	std::int32_t m_move_count;
 	tt_program::position_t m_cur_pos;
+	std::string m_name;
 };
 
 } // namespace tt_program
