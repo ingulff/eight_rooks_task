@@ -110,7 +110,7 @@ void rook_t::make_next_move()
 	tt_program::position_t next_pos = m_cur_pos;
 	move_t next_move;
 
-	while( (is_successs_move == false) )
+	while( is_successs_move == false )
 	{
 		auto timeout = wait_next_move();
 		remainder_timeout -= timeout;
