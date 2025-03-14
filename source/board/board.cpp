@@ -9,15 +9,19 @@ namespace tt_program
 
 board_t::board_t(std::int8_t rooks_count, tt_program::event_logger & logger)
 	: m_board( {0} )
-	, m_mutex()
- 	, m_rooks_synchronizer(m_mutex, rooks_count)
+	, m_row_mutexes()
+	, m_col_mutexes()
+ 	, m_rooks_synchronizer(rooks_count)
  	, m_logger(logger)
 {}
 
 
-bool board_t::try_make_horizontal_move(const std::string & fig_name, const position_t & cur_position, const position_t & new_position)
-{
-	std::lock_guard lock(m_mutex);
+bool board_t::try_make_horizontal_move(
+	const std::string & fig_name, 
+	const position_t & cur_position, 
+	const position_t & new_position
+) {
+	std::scoped_lock row_lock(m_row_mutexes[cur_position.y], m_col_mutexes[new_position.x]);
 
 	bool res = false;
 
@@ -25,28 +29,8 @@ bool board_t::try_make_horizontal_move(const std::string & fig_name, const posit
 		&& is_valid_position(new_position) 
 		&& can_make_horizontal_move(cur_position, new_position) )
 	{
-//for(int i = 0; i < 8; ++i)
-//{
-//	std::cout << !!(m_board[cur_position.x] & (1 << i)) << " " ;
-//}
-//std::cout << std::endl;
-//for(int i = 0; i < 8; ++i)
-//{
-//	std::cout << !!(m_board[new_position.x] & (1 << i)) << " " ;
-//}
-//std::cout << std::endl;
 		set_position(new_position);
 		clear_position(cur_position);
-//for(int i = 0; i < 8; ++i)
-//{
-//	std::cout << !!(m_board[cur_position.x] & (1 << i)) << " " ;
-//}
-//std::cout << std::endl;
-//for(int i = 0; i < 8; ++i)
-//{
-//	std::cout << !!(m_board[new_position.x] & (1 << i)) << " " ;
-//}
-//std::cout << std::endl;
 		res = true;
 	}
 
@@ -54,9 +38,12 @@ bool board_t::try_make_horizontal_move(const std::string & fig_name, const posit
 	return res;
 }
 
-bool board_t::try_make_vertical_move(const std::string & fig_name, const position_t & cur_position, const position_t & new_position)
-{
-	std::lock_guard lock(m_mutex);
+bool board_t::try_make_vertical_move(
+	const std::string & fig_name, 
+	const position_t & cur_position,
+	const position_t & new_position
+) {
+	std::scoped_lock col_lock(m_col_mutexes[cur_position.x], m_row_mutexes[new_position.y]);
 
 	bool res = false;
 
@@ -64,28 +51,8 @@ bool board_t::try_make_vertical_move(const std::string & fig_name, const positio
 		&& is_valid_position(new_position) 
 		&& can_make_vertical_move(cur_position, new_position) )
 	{
-//for(int i = 0; i < 8; ++i)
-//{
-//	std::cout << !!(m_board[cur_position.x] & (1 << i)) << " " ;
-//}
-//std::cout << std::endl;
-//for(int i = 0; i < 8; ++i)
-//{
-//	std::cout << !!(m_board[new_position.x] & (1 << i)) << " " ;
-//}
-//std::cout << std::endl;
 		set_position(new_position);
 		clear_position(cur_position);
-//for(int i = 0; i < 8; ++i)
-//{
-//	std::cout << !!(m_board[cur_position.x] & (1 << i)) << " " ;
-//}
-//std::cout << std::endl;
-//for(int i = 0; i < 8; ++i)
-//{
-//	std::cout << !!(m_board[new_position.x] & (1 << i)) << " " ;
-//}
-//std::cout << std::endl;
 		res = true;
 	}
 
@@ -98,7 +65,6 @@ bool board_t::try_make_vertical_move(const std::string & fig_name, const positio
 void board_t::wait_all_rooks()
 {
 	add_rook();
-//std::cout << "add_rook 1" << std::endl;
 	m_rooks_synchronizer.wait();
 }
 
@@ -109,16 +75,14 @@ void board_t::add_rook()
 
 void board_t::start_game()
 {
-//std::cout << "start_game()" << std::endl;
 	m_rooks_synchronizer.notify_all();
 }
 
 bool board_t::set_start_position(const position_t & position)
 {
-	std::lock_guard lock(m_mutex);
+	std::scoped_lock lock(m_row_mutexes[position.y], m_col_mutexes[position.x]);
 
 	bool res = false;
-//std::cout << "set_start_position() - (" << (int)position.x << ", " << (int)position.y << ")" << std::endl; 
 	if( is_valid_position(position) && (has_figure(position) == false) )
 	{
 		res = true;
@@ -138,13 +102,7 @@ bool board_t::has_figure(const position_t & position)
 
 void board_t::set_position(const position_t & position)
 {
-//std::cout << "set_position() - (" << (int)position.x << ", " << (int)position.y << ")   ";
 	m_board[position.x] |= (1 << position.y);
-//for(int i = 0; i < 8; ++i)
-//{
-//	std::cout << !!(m_board[position.x] & (1 << i)) << " " ;
-//}
-//std::cout << std::endl;
 }
 
 void board_t::clear_position(const position_t & position)

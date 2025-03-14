@@ -57,7 +57,8 @@ public:
 
 private:
 	std::array<data_t, 8> m_board;
-	std::mutex m_mutex;
+	std::array<std::mutex, 8> m_row_mutexes;
+	std::array<std::mutex, 8> m_col_mutexes;
 	tt_utils::rooks_synchronizer m_rooks_synchronizer;
 
 	tt_program::event_logger & m_logger;
