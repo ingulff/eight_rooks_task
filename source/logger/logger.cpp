@@ -87,7 +87,11 @@ void event_logger::log_events()
 	while( m_is_active )
 	{
 		std::unique_lock lock(m_mutex);
-		m_event_guard.wait(lock, [this](){ return this->has_events(); } );
+		m_event_guard.wait_for(
+			lock, 
+			std::chrono::nanoseconds{100},
+			[this](){ return this->has_events(); } 
+		);
 		
 		lock.unlock();
 		while(m_event_queue.empty() == false)
@@ -114,7 +118,6 @@ void event_logger::start()
 
 void event_logger::stop()
 {
-//std::cout << "stoP()" << std::endl;
 	m_is_active.store(false);
 
 	if(m_thread.joinable())
