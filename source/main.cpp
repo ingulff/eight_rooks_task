@@ -43,9 +43,9 @@ int main(int argc, char **argv)
 
 		thread_pool.emplace_back( std::thread(rook_moves) );
 	}
-//std::cout << "pre joint" << std::endl;
+
 	board.add_rook();
-//std::cout << "add_rook 0 " << std::endl;
+
 	board.start_game();
 
 	rook_pool[0].start_moves();
@@ -54,7 +54,6 @@ int main(int argc, char **argv)
 	{
 		thread.join();
 	}
-//std::cout << "after join" << std::endl;
 
 	logger.stop();
 
