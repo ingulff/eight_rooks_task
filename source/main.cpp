@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 			settings.move_count) ) ;
 	}
 
-	for(std::int8_t i = 1; i < settings.rook_count; ++i)
+	for(std::int8_t i = 0; i < settings.rook_count; ++i)
 	{
 		auto rook_moves = [ &rook_pool, index = i ](){
 			rook_pool[index].wait_start_game();
@@ -44,11 +44,7 @@ int main(int argc, char **argv)
 		thread_pool.emplace_back( std::thread(rook_moves) );
 	}
 
-	board.add_rook();
-
 	board.start_game();
-
-	rook_pool[0].start_moves();
 
 	for(auto & thread : thread_pool)
 	{
