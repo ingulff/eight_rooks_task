@@ -11,11 +11,9 @@ namespace tt_program
 {
 
 template<typename T>
-T rand_between( std::uniform_int_distribution<T> & distr )
-{
-    static std::random_device rd; 
-    static std::mt19937 eng( rd( ) );
-
+T rand_between( std::uniform_int_distribution<T> distr )
+{ 
+    static thread_local std::mt19937 eng{ std::random_device{}() };
     return distr( eng );
 }
 
@@ -58,12 +56,9 @@ void rook_t::start_moves()
 
 	while(m_move_count > 0)
 	{
-//std::cout << "start_moves() - " << m_move_count << std::endl;
 		make_next_move();
 		--m_move_count;
 	}
-
-//std::cout << "start_moves() - end" << std::endl;
 }
 
 
@@ -99,7 +94,6 @@ void rook_t::generate_start_pos()
 
 	m_cur_pos.x = next_hor_pos.next_pos;
 	m_cur_pos.y = next_vert_pos.next_pos;
-//std::cout << "generate_start_pos() - (" << (int)m_cur_pos.x << ", " << (int)m_cur_pos.y << ")" << std::endl;
 }
 
 
@@ -114,7 +108,6 @@ void rook_t::make_next_move()
 	{
 		auto timeout = wait_next_move();
 		remainder_timeout -= timeout;
-//std::cout << "reminder_timeout: " << remainder_timeout << std::endl;
 		if(remainder_timeout < 1)
 		{
 			remainder_timeout = m_wait_move_timeout;
@@ -136,7 +129,6 @@ void rook_t::make_next_move()
 			}
 
 		}
-//std::cout << "next_move: (" << (int)m_cur_pos.x << ", " << (int)m_cur_pos.y << ") -> (" << (int)(int)next_pos.x << ", " << (int)next_pos.y << ")" << std::endl;
 
 		if(next_move.dir == rook_t::move_direction::vertical)
 		{
