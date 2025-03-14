@@ -11,9 +11,11 @@ namespace tt_utils
 class rooks_synchronizer
 {
 public:
-    rooks_synchronizer(std::mutex & mutex, const std::int8_t max_rooks_count)
+    rooks_synchronizer(
+        const std::int8_t max_rooks_count
+    )
         : m_rooks_starter()
-        , m_mutex(mutex)
+        , m_mutex()
         , m_max_rooks(max_rooks_count)
         , m_active_rooks(0)
     {}
@@ -27,7 +29,6 @@ public:
     void wait( )
     {
         std::unique_lock lock( m_mutex );
-//std::cout << "sync::wait() - " << (int)m_active_rooks << std::endl;
         m_rooks_starter.wait( lock, [this](){ return !( this->need_wait() ); } );
     }
 
@@ -38,19 +39,17 @@ public:
 
     void notify_all()
     {
-//std::cout << "notify all (" << std::endl;
         while ( need_wait() )
         {
             ;
         }
-//std::cout << "notify all )" << std::endl;
         m_rooks_starter.notify_all( );
     }
 
 private:
 
     std::condition_variable m_rooks_starter;
-    std::mutex & m_mutex;
+    std::mutex m_mutex;
     const std::int8_t m_max_rooks;
     std::atomic_int8_t m_active_rooks = 0;
 };
