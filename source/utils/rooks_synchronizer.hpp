@@ -2,6 +2,7 @@
 #define TT_ROOKS_SYNCHRONIZER_HPP
 
 #include <atomic>
+#include <barrier>
 #include <condition_variable>
 #include <mutex>
 
@@ -14,44 +15,18 @@ public:
     rooks_synchronizer(
         const std::int8_t max_rooks_count
     )
-        : m_rooks_starter()
-        , m_mutex()
-        , m_max_rooks(max_rooks_count)
-        , m_active_rooks(0)
+        : m_start_barrier(max_rooks_count + 1)
     {}
 
 public:
-    void add_rook_to_active()
-    {
-        ++m_active_rooks;
-    }
 
-    void wait( )
+    void wait_for_start()
     {
-        std::unique_lock lock( m_mutex );
-        m_rooks_starter.wait( lock, [this](){ return !( this->need_wait() ); } );
-    }
-
-    bool need_wait()
-    {
-        return m_active_rooks.load( std::memory_order_acquire ) != m_max_rooks;
-    }
-
-    void notify_all()
-    {
-        while ( need_wait() )
-        {
-            ;
-        }
-        m_rooks_starter.notify_all( );
+        m_start_barrier.arrive_and_wait();
     }
 
 private:
-
-    std::condition_variable m_rooks_starter;
-    std::mutex m_mutex;
-    const std::int8_t m_max_rooks;
-    std::atomic_int8_t m_active_rooks = 0;
+    std::barrier<> m_start_barrier;
 };
 
 } // namespace tt_utils
