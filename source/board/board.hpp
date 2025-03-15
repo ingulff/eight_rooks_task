@@ -29,9 +29,6 @@ public:
 	bool try_make_vertical_move(const std::string & fig_name, const position_t & cur_position, const position_t & new_position);
 
 public:
-	void wait_all_rooks();
-
-	void add_rook();
 
 	void start_game();
 
@@ -55,10 +52,21 @@ private:
 public:
 	board_data_t data() const;
 
+public:
+	struct move_conditions
+	{
+		std::condition_variable& col_conditional;
+		std::condition_variable& raw_conditional;
+	};
+
+	move_conditions get_move_conditions(const position_t & position);
+
 private:
 	std::array<data_t, 8> m_board;
 	std::array<std::mutex, 8> m_row_mutexes;
 	std::array<std::mutex, 8> m_col_mutexes;
+	std::array<std::condition_variable, 8> m_row_move_conditions;
+	std::array<std::condition_variable, 8> m_col_move_conditions;
 	tt_utils::rooks_synchronizer m_rooks_synchronizer;
 
 	tt_program::event_logger & m_logger;

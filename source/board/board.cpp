@@ -11,6 +11,8 @@ board_t::board_t(std::int8_t rooks_count, tt_program::event_logger & logger)
 	: m_board( {0} )
 	, m_row_mutexes()
 	, m_col_mutexes()
+	, m_row_move_conditions()
+	, m_col_move_conditions()
  	, m_rooks_synchronizer(rooks_count)
  	, m_logger(logger)
 {}
@@ -21,7 +23,7 @@ bool board_t::try_make_horizontal_move(
 	const position_t & cur_position, 
 	const position_t & new_position
 ) {
-	std::scoped_lock row_lock(m_row_mutexes[cur_position.y], m_col_mutexes[new_position.x]);
+	std::scoped_lock row_lock(m_row_mutexes[cur_position.x], m_col_mutexes[new_position.y]);
 
 	bool res = false;
 
@@ -34,7 +36,7 @@ bool board_t::try_make_horizontal_move(
 		res = true;
 	}
 
-	m_logger.log( { fig_name, cur_position, new_position, data(), res } );
+	//m_logger.log( { fig_name, cur_position, new_position, data(), res } );
 	return res;
 }
 
@@ -43,7 +45,7 @@ bool board_t::try_make_vertical_move(
 	const position_t & cur_position,
 	const position_t & new_position
 ) {
-	std::scoped_lock col_lock(m_col_mutexes[cur_position.x], m_row_mutexes[new_position.y]);
+	std::scoped_lock col_lock(m_col_mutexes[cur_position.y], m_row_mutexes[new_position.x]);
 
 	bool res = false;
 
@@ -56,26 +58,15 @@ bool board_t::try_make_vertical_move(
 		res = true;
 	}
 
-	m_logger.log( { fig_name, cur_position, new_position, data(), res } );
-
+	m_row_move_conditions[cur_position.y].notify_all();
+	m_col_move_conditions[cur_position.x].notify_all();
+	//m_logger.log( { fig_name, cur_position, new_position, data(), res } );
 	return res;
-}
-
-
-void board_t::wait_all_rooks()
-{
-	add_rook();
-	m_rooks_synchronizer.wait();
-}
-
-void board_t::add_rook()
-{
-	m_rooks_synchronizer.add_rook_to_active();
 }
 
 void board_t::start_game()
 {
-	m_rooks_synchronizer.notify_all();
+	m_rooks_synchronizer.wait_for_start();
 }
 
 bool board_t::set_start_position(const position_t & position)
@@ -180,6 +171,10 @@ board_data_t board_t::data() const
 	return m_board;
 }
 
+board_t::move_conditions board_t::get_move_conditions(const position_t & position)
+{
+	return { m_col_move_conditions[position.y], m_row_move_conditions[position.x] };
+}
 
 
 bool operator==(const position_t & left, const position_t & right)

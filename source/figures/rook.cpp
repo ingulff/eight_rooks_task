@@ -41,7 +41,7 @@ rook_t::rook_t(tt_program::board_t & board,
 
 void rook_t::wait_start_game()
 {
-	m_board.wait_all_rooks();
+	m_board.start_game();
 	start_moves();
 }
 
@@ -99,51 +99,53 @@ void rook_t::generate_start_pos()
 
 void rook_t::make_next_move()
 {
-	std::int32_t remainder_timeout = -1;
 	bool is_successs_move = false;
 	tt_program::position_t next_pos = m_cur_pos;
 	move_t next_move;
-
+	
 	while( is_successs_move == false )
 	{
-		auto timeout = wait_next_move();
-		remainder_timeout -= timeout;
-		if(remainder_timeout < 1)
+		auto start_move_time = std::chrono::steady_clock::now();
+		while(next_pos == m_cur_pos)
 		{
-			remainder_timeout = m_wait_move_timeout;
-			next_pos = m_cur_pos; // обнуляем клетку в которую хотели пойти
-
-			while(next_pos == m_cur_pos)
+			next_move = generate_next_move();
+			if(next_move.dir == rook_t::move_direction::vertical)
 			{
-				next_move = generate_next_move();
-				if(next_move.dir == rook_t::move_direction::vertical)
-				{
-					next_pos.x = next_move.next_pos;
-					next_pos.y = m_cur_pos.y;
-				}
-				else
-				{
-					next_pos.x = m_cur_pos.x;
-					next_pos.y = next_move.next_pos;
-				}
+				next_pos.x = next_move.next_pos;
+				next_pos.y = m_cur_pos.y;
+			}
+			else
+			{
+				next_pos.x = m_cur_pos.x;
+				next_pos.y = next_move.next_pos;
+			}
+		}
+
+		for(auto cur_time = std::chrono::steady_clock::now();
+			std::chrono::duration_cast<std::chrono::milliseconds>(cur_time - start_move_time).count() < m_wait_move_timeout;
+			cur_time = std::chrono::steady_clock::now()
+		) {
+			if(next_move.dir == rook_t::move_direction::vertical)
+			{
+				is_successs_move = m_board.try_make_vertical_move(m_name, m_cur_pos, next_pos);
+			}
+			else
+			{
+				is_successs_move = m_board.try_make_horizontal_move(m_name, m_cur_pos, next_pos);
 			}
 
-		}
+			if(is_successs_move)
+			{
+				m_cur_pos = next_pos;
+				return;
+			}
 
-		if(next_move.dir == rook_t::move_direction::vertical)
-		{
-			is_successs_move = m_board.try_make_vertical_move(m_name, m_cur_pos, next_pos);
+			auto [col_move_conditional, raw_move_conditional] = m_board.get_move_conditions(next_pos);
+			col_move_conditional.notify_all(),
+			raw_move_conditional.notify_all();
 		}
-		else
-		{
-			is_successs_move = m_board.try_make_horizontal_move(m_name, m_cur_pos, next_pos);
-		}
-
-		if(is_successs_move)
-		{
-			remainder_timeout = -1;
-			m_cur_pos = next_pos;
-		}
+		
+		next_pos = m_cur_pos;
 	}
 }
 
