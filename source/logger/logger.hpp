@@ -49,7 +49,7 @@ private:
 	std::queue<event_t> m_event_queue;
 	std::mutex m_mutex;
 	std::condition_variable m_event_guard;
-	std::thread m_thread;
+	std::jthread  m_thread;
 
 	tt_utils::auto_cpu_timer m_timer;
 

@@ -63,9 +63,9 @@ event_logger::event_logger()
 
 event_logger::~event_logger()
 {
-	if(m_thread.joinable())
+	if( m_is_active )
 	{
-		m_thread.join();
+		stop();
 	}
 }
 
@@ -113,17 +113,12 @@ bool event_logger::has_events()
 void event_logger::start()
 {
 	m_is_active.store(true);
-	m_thread = std::thread([this](){ this->log_events(); });
+	m_thread = std::jthread ([this](){ this->log_events(); });
 }
 
 void event_logger::stop()
 {
 	m_is_active.store(false);
-
-	if(m_thread.joinable())
-	{
-		m_thread.join();
-	}
 
 	m_event_guard.notify_one();
 }

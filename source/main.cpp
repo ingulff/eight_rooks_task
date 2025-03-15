@@ -22,8 +22,8 @@ int main(int argc, char **argv)
 	auto settings = tt_program::make_default_settings();
 	
 	tt_program::board_t board(settings.rook_count, logger);
-	std::vector<std::thread> thread_pool;
 	std::vector<tt_program::rook_t> rook_pool;
+	std::vector<std::jthread > thread_pool;
 	
 	for(std::int8_t i = 0; i < settings.rook_count; ++i)
 	{
@@ -41,15 +41,10 @@ int main(int argc, char **argv)
 			rook_pool[index].wait_start_game();
 		};
 
-		thread_pool.emplace_back( std::thread(rook_moves) );
+		thread_pool.emplace_back( std::jthread (rook_moves) );
 	}
 
 	board.start_game();
-
-	for(auto & thread : thread_pool)
-	{
-		thread.join();
-	}
 
 	logger.stop();
 
