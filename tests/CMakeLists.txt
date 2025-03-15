@@ -60,14 +60,14 @@ set(COMPILE_OPTIONS)
 if(MSVC)
 	list(APPEND 
 		COMPILE_OPTIONS 
-		/std:c++17
+		/std:c++20
 		/Zc:__cplusplus
 		/bigobj
 	)
 else()
 	list(APPEND
 		COMPILE_OPTIONS
-		-std=c++17
+		-std=c++20
 	)
 endif()
 
